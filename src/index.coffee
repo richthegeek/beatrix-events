@@ -6,17 +6,19 @@ Promise = require 'bluebird'
 
 class Manager
 
+  name: null
   ready: null
   connection: null
 
   connect: (options, cb) ->
+    @name = options.name
     @ready = new Promise (resolve, reject) =>
       @connection = Beatrix {
         connection: {
           uri: options.uri
         },
         exchange: {
-          name: options.name,
+          name: 'events',
           autoDelete: false,
           durable: true,
           type: 'topic'
@@ -49,8 +51,8 @@ class Manager
   on: (event, options, method) ->
     @ready.then =>
       options = _.defaults {}, options, {
-        name: event,
-        type: event,
+        name: @name + '.' + event,
+        type: @name + '.' + event,
         routingKey: event,
         autoDelete: options.persistent is false,
         durable: options.persistent isnt false,
@@ -70,11 +72,6 @@ class Manager
   # publishes an event to the queue
   emit: (event, body, cb) ->
     @ready.then =>
-      job = new Beatrix.Job event, {
-        options: {name: event}
-        channel: @connection.channel,
-        connection: @connection
-      }
-      job.publish body, {messageId: body.id ? uuid.v4()}, cb
+      @connection.publish event, body, {}, cb
 
 module.exports = new Manager()

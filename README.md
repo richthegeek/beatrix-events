@@ -7,7 +7,7 @@ System for emitting and reacting to events using [Beatrix](https://github.com/ri
 Manager = require 'beatrix-events'
 
 Manager.connect {
-  name: 'blah', # name of exchange, defaults to 'events'
+  name: 'blah', # name of this application, for namespacing queues
   uri: 'amqp://guest:guest@localhost/' # would normally be passed based on environment settings
 }
 

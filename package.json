@@ -1,6 +1,6 @@
 {
   "name": "beatrix-events",
-  "version": "2.0.0",
+  "version": "2.2.0",
   "description": "System for emitting and reacting to events using beatrix",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   "author": "Richard Lyon <richard@veoo.com>",
   "license": "ISC",
   "dependencies": {
-    "beatrix": "^2.1.0",
+    "beatrix": "^2.2.0",
     "sift": "^3.2.7",
     "uuid": "^3.0.1",
     "lodash": "^4.17.4",
