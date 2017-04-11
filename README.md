@@ -3,7 +3,8 @@
 System for emitting and reacting to events using [Beatrix](https://github.com/richthegeek/beatrix) / RabbitMQ
 
 ## Sample usage
-```Manager = require 'beatrix-events'
+```coffeescript
+Manager = require 'beatrix-events'
 
 Manager.connect {
   name: 'blah', # name of exchange, defaults to 'events'
