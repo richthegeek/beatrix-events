@@ -1,0 +1,24 @@
+{
+  "name": "beatrix-events",
+  "version": "2.0.0",
+  "description": "System for emitting and reacting to events using beatrix",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "build": "$(npm bin)/coffee -cmo lib src",
+    "dev:build": "$(npm bin)/coffee -cmo lib -w src"
+  },
+  "author": "Richard Lyon <richard@veoo.com>",
+  "license": "ISC",
+  "dependencies": {
+    "beatrix": "^2.1.0",
+    "sift": "^3.2.7",
+    "uuid": "^3.0.1",
+    "lodash": "^4.17.4",
+    "bluebird": "^3.5.0"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.12.5",
+    "mocha": "^3.2.0"
+  }
+}
