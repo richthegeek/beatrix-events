@@ -70,8 +70,9 @@ class Manager
       @connection.createQueue event, options, cb
 
   # publishes an event to the queue
-  emit: (event, body, cb) ->
+  emit: (event, body, options, cb) ->
+    options = _.defaults {}, options, {routingKey: event}
     @ready.then =>
-      @connection.publish event, body, {routingKey: event}, cb
+      @connection.publish event, body, options, cb
 
 module.exports = new Manager()
