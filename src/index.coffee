@@ -17,7 +17,7 @@ class Manager
         connection: {
           uri: options.uri
         },
-        exchange: {
+        exchange: _.defaults {}, options.exchange, {
           name: 'events',
           autoDelete: false,
           durable: true,
