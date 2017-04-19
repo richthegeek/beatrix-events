@@ -11,11 +11,11 @@
   "author": "Richard Lyon <richard@veoo.com>",
   "license": "ISC",
   "dependencies": {
-    "beatrix": "^2.2.1",
-    "sift": "^3.2.7",
-    "uuid": "^3.0.1",
+    "beatrix": "git+https://github.com/ikropotov/beatrix.git",
+    "bluebird": "^3.5.0",
     "lodash": "^4.17.4",
-    "bluebird": "^3.5.0"
+    "sift": "^3.2.7",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "coffee-script": "^1.12.5",
