@@ -66,7 +66,12 @@ class Manager
         unless @filter options.filter, message.body
           return cb null, 'Filtered'
 
-        method message.body, cb
+        method(message.body)
+        .then (result) ->
+          cb(null, result)
+        .catch (err) ->
+          cb(err)
+
       new Promise (resolve, reject) =>
         @connection.createQueue event, options, (err, result) ->
           if err then reject(err) else resolve(result)
