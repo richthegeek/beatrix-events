@@ -49,7 +49,7 @@ class Manager
   #  - autoDelete: boolean, should the queue delete when no consumers exist, based on `persistent`
   #  - durable: boolean, should the queue survive a rabbitmq reboot, based on `persistent`
   #  - filter: siftQuery or function that must return true for the event to be passed to the cb
-  on: (event, options, method, cb) ->
+  on: (event, options, method) ->
     @ready.then =>
       options = _.defaults {}, options, {
         name: @name + '.' + event,
@@ -67,13 +67,16 @@ class Manager
           return cb null, 'Filtered'
 
         method message.body, cb
-
-      @connection.createQueue event, options, cb
+      new Promise (resolve, reject) =>
+        @connection.createQueue event, options, (err, result) ->
+          if err then reject(err) else resolve(result)
 
   # publishes an event to the queue
-  emit: (event, body, options, cb) ->
+  emit: (event, body, options) ->
     options = _.defaults {}, options, {routingKey: event}
     @ready.then =>
-      @connection.publish event, body, options, cb
+      new Promise (resolve, reject) =>
+        @connection.publish event, body, options, (err, result) =>
+          if err then reject(err) else resolve(result)
 
 module.exports = new Manager()
