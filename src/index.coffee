@@ -22,7 +22,8 @@ class Manager
           autoDelete: false,
           durable: true,
           type: 'topic'
-        }
+        },
+        responseQueue: false
       }, (err, res) ->
         if err
           reject err

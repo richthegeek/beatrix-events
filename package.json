@@ -1,6 +1,6 @@
 {
   "name": "beatrix-events",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "System for emitting and reacting to events using beatrix",
   "main": "index.js",
   "scripts": {
