@@ -12,10 +12,13 @@ class Manager
   onReadyStack: []
 
   ready: (fn) ->
-    if @connection?.ready
-      return fn()
-    else
-      @onReadyStack.push(fn)
+    return new Promise (resolve, reject) =>
+      if @connection?.ready
+        resolve()
+        fn and fn()
+      else
+        @onReadyStack.push(resolve)
+        fn and @onReadyStack.push(fn)
 
   connect: (options, cb) ->
     cb ?= (err) -> if err then throw err
@@ -59,7 +62,7 @@ class Manager
   #  - durable: boolean, should the queue survive a rabbitmq reboot, based on `persistent`
   #  - filter: siftQuery or function that must return true for the event to be passed to the cb
   on: (event, options, method) ->
-    @ready =>
+    @ready().then =>
       options = _.defaults {}, options, {
         name: @name + '.' + event,
         type: @name + '.' + event,
@@ -81,7 +84,7 @@ class Manager
 
   # publishes an event to the queue
   emit: (event, body, cb) ->
-    @ready =>
+    @ready().then =>
       @connection.publish event, body, {routingKey: event}, cb
 
 module.exports = new Manager()
