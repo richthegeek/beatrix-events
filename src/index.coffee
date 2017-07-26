@@ -7,28 +7,37 @@ Promise = require 'bluebird'
 class Manager
 
   name: null
-  ready: null
   connection: null
 
+  onReadyStack: []
+
+  ready: (fn) ->
+    if @connection?.ready
+      return fn()
+    else
+      @onReadyStack.push(fn)
+
   connect: (options, cb) ->
+    cb ?= (err) -> if err then throw err
     @name = options.name
-    @ready = new Promise (resolve, reject) =>
-      @connection = Beatrix {
-        connection: {
-          uri: options.uri
-        },
-        exchange: {
-          name: 'events',
-          autoDelete: false,
-          durable: true,
-          type: 'topic'
-        },
-        responseQueue: false
-      }, (err, res) ->
-        if err
-          reject err
-        else
-          resolve res
+    @connection = Beatrix {
+      connection: {
+        uri: options.uri
+      },
+      exchange: {
+        name: 'events',
+        autoDelete: false,
+        durable: true,
+        type: 'topic'
+      },
+      responseQueue: false
+    }, (err, res) =>
+      if err
+        return cb err
+      else
+        @connection.ready = true
+        @onReadyStack.forEach((fn) -> fn())
+        return cb()
 
   filter: (filter, message) ->
     if 'function' is typeof filter
@@ -50,7 +59,7 @@ class Manager
   #  - durable: boolean, should the queue survive a rabbitmq reboot, based on `persistent`
   #  - filter: siftQuery or function that must return true for the event to be passed to the cb
   on: (event, options, method) ->
-    @ready.then =>
+    @ready =>
       options = _.defaults {}, options, {
         name: @name + '.' + event,
         type: @name + '.' + event,
@@ -72,7 +81,7 @@ class Manager
 
   # publishes an event to the queue
   emit: (event, body, cb) ->
-    @ready.then =>
+    @ready =>
       @connection.publish event, body, {routingKey: event}, cb
 
 module.exports = new Manager()
