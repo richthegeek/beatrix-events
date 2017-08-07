@@ -7,28 +7,40 @@ Promise = require 'bluebird'
 class Manager
 
   name: null
-  ready: null
   connection: null
 
+  onReadyStack: []
+
+  ready: (fn) ->
+    return new Promise (resolve, reject) =>
+      if @connection?.ready
+        resolve()
+        fn and fn()
+      else
+        @onReadyStack.push(resolve)
+        fn and @onReadyStack.push(fn)
+
   connect: (options, cb) ->
+    cb ?= (err) -> if err then throw err
     @name = options.name
-    @ready = new Promise (resolve, reject) =>
-      @connection = Beatrix {
-        connection: {
-          uri: options.uri
-        },
-        exchange: _.defaults {}, options.exchange, {
-          name: 'events',
-          autoDelete: false,
-          durable: true,
-          type: 'topic'
-        },
-        responseQueue: false
-      }, (err, res) ->
-        if err
-          reject err
-        else
-          resolve res
+    @connection = Beatrix {
+      connection: {
+        uri: options.uri
+      },
+      exchange: {
+        name: 'events',
+        autoDelete: false,
+        durable: true,
+        type: 'topic'
+      },
+      responseQueue: false
+    }, (err, res) =>
+      if err
+        return cb err
+      else
+        @connection.ready = true
+        @onReadyStack.forEach((fn) -> fn())
+        return cb()
 
   filter: (filter, message) ->
     if 'function' is typeof filter
@@ -50,7 +62,7 @@ class Manager
   #  - durable: boolean, should the queue survive a rabbitmq reboot, based on `persistent`
   #  - filter: siftQuery or function that must return true for the event to be passed to the cb
   on: (event, options, method) ->
-    @ready.then =>
+    @ready().then =>
       options = _.defaults {}, options, {
         name: @name + '.' + event,
         type: @name + '.' + event,
@@ -79,7 +91,7 @@ class Manager
   # publishes an event to the queue
   emit: (event, body, options) ->
     options = _.defaults {}, options, {routingKey: event}
-    @ready.then =>
+    @ready().then =>
       new Promise (resolve, reject) =>
         @connection.publish event, body, options, (err, result) =>
           if err then reject(err) else resolve(result)
