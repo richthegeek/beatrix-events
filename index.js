@@ -10,6 +10,7 @@ class Manager {
       name: options.name,
       uri: options.uri,
       exchange: {
+        name: 'events',
         autoDelete: false,
         durable: true,
         type: 'topic'
@@ -20,10 +21,12 @@ class Manager {
 
   filter (filter, message) {
     if (_.isFunction(filter)) {
+      console.log('FILTER_F', filter, message, filter(message))
       return filter(message);
     }
 
     if (_.isObject(filter)) {
+      console.log('FILTER_S', filter, message, Sift(filter)(message))
       return Sift(filter)(message)
     }
 
@@ -42,8 +45,8 @@ class Manager {
   //  - filter: siftQuery or function that must return true for the event to be passed to the cb
   on (event, options, method) {
     options = _.defaults({}, options, {
-      name: this.name + '.' + event,
-      type: this.name + '.' + event,
+      name: event,
+      type: event,
       routingKey: event,
       autoDelete: options.persistent === false,
       durable: options.persistent !== false,
@@ -52,7 +55,7 @@ class Manager {
 
     options.process = this.process.bind(this, options, method)
 
-    this.connection.createQueue(event, options)
+    this.connection.createQueue(options.name, options)
   }
 
   process (options, method, message) {
@@ -61,7 +64,7 @@ class Manager {
       typeArray: message.fields.routingKey.split('.')
     });
 
-    if (!this.filter(options.filter, message.body)) {
+    if (!this.filter(options.filter, body.body)) {
       return message.resolve('Filtered');
     }
 
@@ -77,8 +80,7 @@ class Manager {
 
   // publishes an event to the queue
   emit (event, body) {
-    console.log('emit', event, body)
-    return this.connection.publish(event, body, {routingKey: event});
+    return this.connection.publish(event, {body}, {routingKey: event});
   }
 }
 
