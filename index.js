@@ -64,7 +64,9 @@ class Manager {
       typeArray: message.fields.routingKey.split('.')
     });
 
-    if (!this.filter(options.filter, body.body)) {
+    console.log('PROCESS', )
+
+    if (!this.filter(options.filter, body)) {
       return message.resolve('Filtered');
     }
 
@@ -80,7 +82,7 @@ class Manager {
 
   // publishes an event to the queue
   emit (event, body) {
-    return this.connection.publish(event, {body}, {routingKey: event});
+    return this.connection.publish(event, body, {routingKey: event});
   }
 }
 
