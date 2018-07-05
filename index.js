@@ -21,12 +21,10 @@ class Manager {
 
   filter (filter, message) {
     if (_.isFunction(filter)) {
-      console.log('FILTER_F', filter, message, filter(message))
       return filter(message);
     }
 
     if (_.isObject(filter)) {
-      console.log('FILTER_S', filter, message, Sift(filter)(message))
       return Sift(filter)(message)
     }
 
