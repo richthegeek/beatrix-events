@@ -1,10 +1,10 @@
 const Beatrix = require('beatrix');
-const Sift = require('sift');
+const Sift = require('sift').default;
 const _ = require('lodash');
 
-class Manager {
+class BeatrixEvents {
 
-  connect (options, cb) {
+  connect (options) {
     this.name = options.name;
     this.connection = Beatrix({
       name: options.name,
@@ -62,19 +62,15 @@ class Manager {
       typeArray: message.fields.routingKey.split('.')
     });
 
-    console.log('PROCESS', )
-
     if (!this.filter(options.filter, body)) {
       return message.resolve('Filtered');
     }
 
-    method(message.body, (err, res) => {
-      if (err) {
-        message.retry(true);
-        message.reject(err);
-      } else {
-        message.resolve(res);
-      }
+    return method(message.body).then((res) => {
+      message.resolve(res);
+    }, (err) => {
+      message.retry(true);
+      message.reject(err);
     });
   }
 
@@ -84,4 +80,4 @@ class Manager {
   }
 }
 
-module.exports = new Manager()
+module.exports = new BeatrixEvents()
