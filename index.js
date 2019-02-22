@@ -9,6 +9,7 @@ class BeatrixEvents {
     this.connection = Beatrix({
       name: options.name,
       uri: options.uri,
+      log: options.log,
       exchange: {
         name: 'events',
         autoDelete: false,

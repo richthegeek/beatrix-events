@@ -1,15 +1,18 @@
 {
   "name": "beatrix-events",
-  "version": "3.4.0",
+  "version": "3.4.1",
   "description": "System for emitting and reacting to events using beatrix",
   "main": "index.js",
   "scripts": {
     "test": "echo No tests!"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.com"
+  },
   "author": "Richard Lyon <richard@veoo.com>",
   "license": "ISC",
   "dependencies": {
-    "beatrix": "^3.4.0",
+    "beatrix": "^3.5.2",
     "lodash": "^4.17.11",
     "sift": "^7.0.1"
   }
